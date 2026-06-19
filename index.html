@@ -140,6 +140,16 @@
     .section-note { display: none; }
     .section-map { height: 150px; }
   }
+
+  /* filter bar */
+  .filterbar{position:sticky;top:0;z-index:50;background:var(--paper);border-bottom:1px solid var(--border);transition:transform .25s ease;}
+  .filterbar.fb-hidden{transform:translateY(-110%);}
+  .fb-inner{max-width:900px;margin:0 auto;padding:9px 16px;display:flex;flex-direction:column;gap:7px;}
+  .fb-row{display:flex;gap:7px;align-items:center;flex-wrap:wrap;}
+  .fb-btn{font-size:12px;font-weight:600;letter-spacing:.03em;padding:6px 12px;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--ink);cursor:pointer;-webkit-tap-highlight-color:transparent;line-height:1;}
+  .fb-btn:hover{border-color:var(--ink);}
+  .fb-btn.active{background:var(--red);border-color:var(--red);color:#fff;}
+  .fb-count{margin-left:auto;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
 </style>
 </head>
 <body>
@@ -181,7 +191,24 @@
   </div>
 
   <!-- ═══════════════════ PORTO ═══════════════════ -->
-  <section class="section">
+  <div id="filterbar" class="filterbar">
+  <div class="fb-inner">
+    <div class="fb-row">
+      <button class="fb-btn fb-city active" data-city="all">All</button>
+      <button class="fb-btn fb-city" data-city="porto">Porto</button>
+      <button class="fb-btn fb-city" data-city="coimbra">Coimbra</button>
+      <button class="fb-btn fb-city" data-city="cascais">Cascais</button>
+      <button class="fb-btn fb-city" data-city="lisbon">Lisbon</button>
+    </div>
+    <div class="fb-row">
+      <button class="fb-btn fb-price" data-price="1">$</button>
+      <button class="fb-btn fb-price" data-price="2">$$</button>
+      <button class="fb-btn fb-healthy" data-healthy="1">🌿 Healthy</button>
+      <span class="fb-count" id="fbCount">33 shown</span>
+    </div>
+  </div>
+</div>
+<section class="section" data-section-city="porto">
     <div class="section-header">
       <span class="section-day">Jul 3–6 · Stop 1</span>
       <h2 class="section-title">Porto</h2>
@@ -201,7 +228,7 @@
     <div class="sub-label"><span class="sub-label-main">Dinner</span><span class="sub-label-note">sorted by rating · closures noted</span></div>
     <div class="grid">
 
-      <div class="card standout">
+      <div class="card standout" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=DAMA%20pe%20de%20cabra&query_place_id=ChIJj2WnPu9kJA0RtToi37tMeqs" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">DAMA pé de cabra</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.9</span><span class="card-reviews">1,441 reviews</span></div>
@@ -210,7 +237,7 @@
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=DAMA%20pe%20de%20cabra&destination_place_id=ChIJj2WnPu9kJA0RtToi37tMeqs" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351913754955">Call</a></div>
       </div>
 
-      <div class="card standout">
+      <div class="card standout" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=The%20Door%20Porto&query_place_id=ChIJa4rq8nZlJA0Re3QVSXMXgX0" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">The Door</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">2,232 reviews</span></div>
@@ -219,7 +246,7 @@
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=The%20Door%20Porto&destination_place_id=ChIJa4rq8nZlJA0Re3QVSXMXgX0" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351964963136">Call</a></div>
       </div>
 
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=A%20Despensa%20Porto&query_place_id=ChIJKUXs_uJkJA0RFMpDf17u-f4" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">A Despensa</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">6,160 reviews</span></div>
@@ -228,7 +255,7 @@
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=A%20Despensa%20Porto&destination_place_id=ChIJKUXs_uJkJA0RFMpDf17u-f4" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351933962261">Call</a></div>
       </div>
 
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Bota%20%26%20Bira%20Porto&query_place_id=ChIJR9mM3uFkJA0RINhvAzWXWCc" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Bota &amp; Bira</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">2,404 reviews</span></div>
@@ -237,7 +264,7 @@
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Bota%20%26%20Bira%20Porto&destination_place_id=ChIJR9mM3uFkJA0RINhvAzWXWCc" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351960244918">Call</a></div>
       </div>
 
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=The%20Ribs%20Porto&query_place_id=ChIJcTCuaudlJA0R9M9PgMsY670" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">The Ribs</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">1,411 reviews</span></div>
@@ -246,7 +273,7 @@
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=The%20Ribs%20Porto&destination_place_id=ChIJcTCuaudlJA0R9M9PgMsY670" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351222086712">Call</a></div>
       </div>
 
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Almada%20Terrace%20Porto&query_place_id=ChIJPThLL8tlJA0RuF-2eoMT_fg" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Almada Terrace</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">1,360 reviews</span></div>
@@ -255,7 +282,7 @@
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Almada%20Terrace%20Porto&destination_place_id=ChIJPThLL8tlJA0RuF-2eoMT_fg" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351917621196">Call</a></div>
       </div>
 
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Brasao%20Aliados%20Porto&query_place_id=ChIJ_dfatPxkJA0RdeN-V4teCuw" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Brasão Aliados</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.6</span><span class="card-reviews">16,642 reviews</span></div>
@@ -264,7 +291,7 @@
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Brasao%20Aliados%20Porto&destination_place_id=ChIJ_dfatPxkJA0RdeN-V4teCuw" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351934158672">Call</a></div>
       </div>
 
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Bacalhau%20Porto&query_place_id=ChIJMTxEH-BkJA0RHKaU_xuGBNo" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Bacalhau</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.6</span><span class="card-reviews">4,617 reviews</span></div>
@@ -273,7 +300,7 @@
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Bacalhau%20Porto&destination_place_id=ChIJMTxEH-BkJA0RHKaU_xuGBNo" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351960378883">Call</a></div>
       </div>
 
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Taberna%20dos%20Mercadores%20Porto&query_place_id=ChIJgy4W_OBkJA0RUZIgTRYC8zw" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Taberna dos Mercadores</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.5</span><span class="card-reviews">3,828 reviews</span></div>
@@ -286,7 +313,7 @@
 
     <div class="sub-label"><span class="sub-label-main">🌿 Lighter &amp; fresh</span><span class="sub-label-note">salads · bowls · juices</span></div>
     <div class="grid">
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="1">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=NOLA%20Kitchen%20Porto&query_place_id=ChIJQcQqDghlJA0RWYJJPTN8srY" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">NOLA Kitchen</div><div class="card-badges"><span class="badge badge-healthy">🌿</span><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.6</span><span class="card-reviews">3,575 reviews</span></div>
@@ -294,7 +321,7 @@
         </a>
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=NOLA%20Kitchen%20Porto&destination_place_id=ChIJQcQqDghlJA0RWYJJPTN8srY" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351910595015">Call</a></div>
       </div>
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="1">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Honest%20Greens%20Porto&query_place_id=ChIJt5i7mb5lJA0RmRxMVJNjyUk" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Honest Greens (Santa Catarina)</div><div class="card-badges"><span class="badge badge-healthy">🌿</span><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.3</span><span class="card-reviews">3,630 reviews</span></div>
@@ -314,7 +341,7 @@
   </section>
 
   <!-- ═══════════════════ COIMBRA ═══════════════════ -->
-  <section class="section">
+  <section class="section" data-section-city="coimbra">
     <div class="section-header">
       <span class="section-day">Jul 6–8 · Stop 2</span>
       <h2 class="section-title">Coimbra</h2>
@@ -333,7 +360,7 @@
     <div class="sub-label"><span class="sub-label-main">Dinner</span><span class="sub-label-note">all open Mon &amp; Tue (your nights)</span></div>
     <div class="grid">
 
-      <div class="card standout">
+      <div class="card standout" data-price="1" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Ze%20Manel%20dos%20Ossos%20Coimbra&query_place_id=ChIJaSB_0gf5Ig0RQpAh_yloaHY" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Zé Manel dos Ossos</div><div class="card-badges"><span class="badge badge-price-1">$</span><span class="badge badge-flag">⚑</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.7</span><span class="card-reviews">3,038 reviews</span></div>
@@ -342,7 +369,7 @@
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Ze%20Manel%20dos%20Ossos%20Coimbra&destination_place_id=ChIJaSB_0gf5Ig0RQpAh_yloaHY" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351239823790">Call</a></div>
       </div>
 
-      <div class="card standout">
+      <div class="card standout" data-price="2" data-healthy="1">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Restaurante%20Sete%20Coimbra&query_place_id=ChIJxd6jrAj5Ig0RvQOkWnMFNiY" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Restaurante Sete</div><div class="card-badges"><span class="badge badge-healthy">🌿</span><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.7</span><span class="card-reviews">2,311 reviews</span></div>
@@ -351,7 +378,7 @@
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Restaurante%20Sete%20Coimbra&destination_place_id=ChIJxd6jrAj5Ig0RvQOkWnMFNiY" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351919138777">Call</a></div>
       </div>
 
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Terraco%20da%20Alta%20Coimbra&query_place_id=ChIJ25zVSQn5Ig0RSJI0ySi7aWI" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Terraço da Alta</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.6</span><span class="card-reviews">1,841 reviews</span></div>
@@ -360,7 +387,7 @@
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Terraco%20da%20Alta%20Coimbra&destination_place_id=ChIJ25zVSQn5Ig0RSJI0ySi7aWI" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351927318578">Call</a></div>
       </div>
 
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Solar%20do%20Bacalhau%20Coimbra&query_place_id=ChIJ3eyJSQb5Ig0R0VVb7tbugCY" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Solar do Bacalhau</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.4</span><span class="card-reviews">5,944 reviews</span></div>
@@ -379,7 +406,7 @@
   </section>
 
   <!-- ═══════════════════ CASCAIS ═══════════════════ -->
-  <section class="section">
+  <section class="section" data-section-city="cascais">
     <div class="section-header">
       <span class="section-day">Jul 8–10 · Stop 3</span>
       <h2 class="section-title">Cascais</h2>
@@ -398,7 +425,7 @@
     <div class="sub-label"><span class="sub-label-main">In town</span><span class="sub-label-note">~10 min drive from the hotel · all open Wed &amp; Thu</span></div>
     <div class="grid">
 
-      <div class="card standout">
+      <div class="card standout" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Taberna%20Clandestina%20Cascais&query_place_id=ChIJU9_Dcy_EHg0Rq9-dpcBMCkY" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Taberna Clandestina</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.7</span><span class="card-reviews">3,608 reviews</span></div>
@@ -407,7 +434,7 @@
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Taberna%20Clandestina%20Cascais&destination_place_id=ChIJU9_Dcy_EHg0Rq9-dpcBMCkY" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351916229630">Call</a></div>
       </div>
 
-      <div class="card standout">
+      <div class="card standout" data-price="2" data-healthy="1">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Hifen%20Cascais&query_place_id=ChIJFaKnFy7EHg0Rs45k6DCl7wI" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Hífen</div><div class="card-badges"><span class="badge badge-healthy">🌿</span><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.6</span><span class="card-reviews">2,839 reviews</span></div>
@@ -416,7 +443,7 @@
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Hifen%20Cascais&destination_place_id=ChIJFaKnFy7EHg0Rs45k6DCl7wI" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351915546537">Call</a></div>
       </div>
 
-      <div class="card">
+      <div class="card" data-price="1" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=A%20Nova%20Estrela%20Cascais&query_place_id=ChIJ4Sd4cC_EHg0RhtrX-q9xppo" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">A Nova Estrela</div><div class="card-badges"><span class="badge badge-price-1">$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.7</span><span class="card-reviews">4,076 reviews</span></div>
@@ -429,7 +456,7 @@
 
     <div class="sub-label"><span class="sub-label-main">By the beach (near your hotel)</span><span class="sub-label-note">Guincho seafood</span></div>
     <div class="grid">
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Mar%20do%20Guincho&query_place_id=ChIJBRsz_wbEHg0RLU5Jot1n1xI" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Mar do Guincho</div><div class="card-badges"><span class="badge badge-price-2">$$</span><span class="badge badge-flag">⚑</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.5</span><span class="card-reviews">1,398 reviews</span></div>
@@ -441,7 +468,7 @@
 
     <div class="sub-label"><span class="sub-label-main">🌿 Lighter &amp; fresh</span><span class="sub-label-note">salads · bowls · veg</span></div>
     <div class="grid">
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="1">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=House%20of%20Wonders%20Cascais&query_place_id=ChIJPQiMXy7EHg0Rw3Hi0c6K9Zg" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">House of Wonders</div><div class="card-badges"><span class="badge badge-healthy">🌿</span><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.5</span><span class="card-reviews">3,212 reviews</span></div>
@@ -449,7 +476,7 @@
         </a>
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=House%20of%20Wonders%20Cascais&destination_place_id=ChIJPQiMXy7EHg0Rw3Hi0c6K9Zg" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351911702428">Call</a></div>
       </div>
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="1">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Honest%20Greens%20Cascais&query_place_id=ChIJU3fcOADFHg0ROKvydVGZfcs" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Honest Greens (Estação)</div><div class="card-badges"><span class="badge badge-healthy">🌿</span><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.2</span><span class="card-reviews">531 reviews</span></div>
@@ -466,7 +493,7 @@
   </section>
 
   <!-- ═══════════════════ LISBON ═══════════════════ -->
-  <section class="section">
+  <section class="section" data-section-city="lisbon">
     <div class="section-header">
       <span class="section-day">Jul 10–14 · Stop 4</span>
       <h2 class="section-title">Lisbon</h2>
@@ -486,7 +513,7 @@
     <div class="sub-label"><span class="sub-label-main">Dinner</span><span class="sub-label-note">near the hotel &amp; central</span></div>
     <div class="grid">
 
-      <div class="card standout">
+      <div class="card standout" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=A%20Nossa%20Casa%20Lisboa&query_place_id=ChIJcVPiRjk1GQ0R4E4ckO3whcA" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">A Nossa Casa</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">2,429 reviews</span></div>
@@ -495,7 +522,7 @@
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=A%20Nossa%20Casa%20Lisboa&destination_place_id=ChIJcVPiRjk1GQ0R4E4ckO3whcA" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351213420484">Call</a></div>
       </div>
 
-      <div class="card standout">
+      <div class="card standout" data-price="2" data-healthy="1">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Santa%20Marta%20Lisboa&query_place_id=ChIJ9Uz0X9ozGQ0Rk1M3Ve5Onrc" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Santa Marta Mediterranean</div><div class="card-badges"><span class="badge badge-healthy">🌿</span><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">2,277 reviews</span></div>
@@ -504,7 +531,7 @@
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Santa%20Marta%20Lisboa&destination_place_id=ChIJ9Uz0X9ozGQ0Rk1M3Ve5Onrc" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351916404726">Call</a></div>
       </div>
 
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Copo%20de%20Mar%20Lisboa&query_place_id=ChIJbZNv5-4zGQ0RiYA0UJccgsA" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Copo de Mar</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">1,590 reviews</span></div>
@@ -513,7 +540,7 @@
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Copo%20de%20Mar%20Lisboa&destination_place_id=ChIJbZNv5-4zGQ0RiYA0UJccgsA" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351217960774">Call</a></div>
       </div>
 
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Salta%20Lisboa&query_place_id=ChIJVV-IIwQzGQ0RskObH-RRdwk" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Salta</div><div class="card-badges"><span class="badge badge-price-2">$$</span><span class="badge badge-flag">⚑</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">1,075 reviews</span></div>
@@ -522,7 +549,7 @@
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Salta%20Lisboa&destination_place_id=ChIJVV-IIwQzGQ0RskObH-RRdwk" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351211325822">Call</a></div>
       </div>
 
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=El%20Clan%20Lisboa&query_place_id=ChIJK28t2n0zGQ0RYMqW_EO5Mns" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">El Clan</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.7</span><span class="card-reviews">4,692 reviews</span></div>
@@ -531,7 +558,7 @@
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=El%20Clan%20Lisboa&destination_place_id=ChIJK28t2n0zGQ0RYMqW_EO5Mns" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351963878863">Call</a></div>
       </div>
 
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=A%20Cozinha%20Sr%20Lisboa&query_place_id=ChIJCxwzRIIzGQ0RC3wjGWOmGKw" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">A Cozinha — Sr. Lisboa</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.6</span><span class="card-reviews">2,460 reviews</span></div>
@@ -544,7 +571,7 @@
 
     <div class="sub-label"><span class="sub-label-main">Seafood</span><span class="sub-label-note">octopus rice · grilled fish · clams</span></div>
     <div class="grid">
-      <div class="card standout">
+      <div class="card standout" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Bessa%20Lisboa&query_place_id=ChIJ9xdTTXg0GQ0RutKXNBrE3_0" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Bessa</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">6,788 reviews</span></div>
@@ -552,7 +579,7 @@
         </a>
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Bessa%20Lisboa&destination_place_id=ChIJ9xdTTXg0GQ0RutKXNBrE3_0" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351218860315">Call</a></div>
       </div>
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Frade%20dos%20Mares%20Lisboa&query_place_id=ChIJdTVGvYM0GQ0RWjKJ5nUblhg" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Frade dos Mares</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.7</span><span class="card-reviews">3,575 reviews</span></div>
@@ -560,7 +587,7 @@
         </a>
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Frade%20dos%20Mares%20Lisboa&destination_place_id=ChIJdTVGvYM0GQ0RWjKJ5nUblhg" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351213909418">Call</a></div>
       </div>
-      <div class="card">
+      <div class="card" data-price="1" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Uma%20Marisqueira%20Lisboa&query_place_id=ChIJU0ckwHg0GQ0RGFRTQgsiyxU" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Uma Marisqueira</div><div class="card-badges"><span class="badge badge-price-1">$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.6</span><span class="card-reviews">24,435 reviews</span></div>
@@ -572,7 +599,7 @@
 
     <div class="sub-label"><span class="sub-label-main">Petiscos &amp; wine</span><span class="sub-label-note">small plates to share</span></div>
     <div class="grid">
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Tapa%20do%20Bairro%20Alto%20Lisboa&query_place_id=ChIJR30HBgs1GQ0Ro5KGgIIgMf8" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Tapa do BairroAlto</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">1,538 reviews</span></div>
@@ -580,7 +607,7 @@
         </a>
         <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Tapa%20do%20Bairro%20Alto%20Lisboa&destination_place_id=ChIJR30HBgs1GQ0Ro5KGgIIgMf8" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351963012182">Call</a></div>
       </div>
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="0">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Prova%20Tapas%20Lisboa&query_place_id=ChIJYcsd7YM1GQ0RkGgJ7HYcwI4" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Prova O Melhor Tapas</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">1,340 reviews</span></div>
@@ -592,7 +619,7 @@
 
     <div class="sub-label"><span class="sub-label-main">🌿 Lighter &amp; fresh</span><span class="sub-label-note">brunch · bowls · juices</span></div>
     <div class="grid">
-      <div class="card">
+      <div class="card" data-price="2" data-healthy="1">
         <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Wel%20Well%20Lisboa&query_place_id=ChIJJbh9i6czGQ0RRItSd6na2-o" target="_blank" rel="noopener">
           <div class="card-top"><div class="card-name">Wel Well</div><div class="card-badges"><span class="badge badge-healthy">🌿</span><span class="badge badge-price-2">$$</span></div></div>
           <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">577 reviews</span></div>
@@ -694,6 +721,55 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
 });
+</script>
+
+<script>
+(function(){
+  var bar=document.getElementById('filterbar');
+  var countEl=document.getElementById('fbCount');
+  if(!bar||!countEl) return;
+  var state={city:'all',price:null,healthy:false};
+  var sections=[].slice.call(document.querySelectorAll('section.section[data-section-city]'));
+  function apply(){
+    var shown=0;
+    sections.forEach(function(sec){
+      var cityOk=(state.city==='all')||(sec.getAttribute('data-section-city')===state.city);
+      sec.style.display=cityOk?'':'none';
+      if(!cityOk) return;
+      [].slice.call(sec.querySelectorAll('.card[data-price]')).forEach(function(card){
+        var pOk=(state.price===null)||(card.getAttribute('data-price')===state.price);
+        var hOk=(!state.healthy)||(card.getAttribute('data-healthy')==='1');
+        var vis=pOk&&hOk;
+        card.style.display=vis?'':'none';
+        if(vis) shown++;
+      });
+    });
+    countEl.textContent=shown+' shown';
+  }
+  bar.addEventListener('click',function(e){
+    var b=e.target.closest?e.target.closest('.fb-btn'):null;
+    if(!b) return;
+    if(b.classList.contains('fb-city')){
+      state.city=b.getAttribute('data-city');
+      [].slice.call(bar.querySelectorAll('.fb-city')).forEach(function(x){x.classList.toggle('active',x===b);});
+      window.scrollTo({top:0,behavior:'smooth'});
+    }else if(b.classList.contains('fb-price')){
+      var p=b.getAttribute('data-price');
+      if(state.price===p){state.price=null;b.classList.remove('active');}
+      else{state.price=p;[].slice.call(bar.querySelectorAll('.fb-price')).forEach(function(x){x.classList.toggle('active',x===b);});}
+    }else if(b.classList.contains('fb-healthy')){
+      state.healthy=!state.healthy;b.classList.toggle('active',state.healthy);
+    }
+    apply();
+  });
+  var lastY=0;
+  window.addEventListener('scroll',function(){
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    if(y>140&&y>lastY){bar.classList.add('fb-hidden');}else{bar.classList.remove('fb-hidden');}
+    lastY=y;
+  },{passive:true});
+  apply();
+})();
 </script>
 </body>
 </html>
