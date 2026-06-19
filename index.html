@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portugal Food Guide — July 3–14, 2026</title>
+<meta name="theme-color" content="#1d6a8f">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+  :root {
+    --ink: #1a1614;
+    --paper: #f5f0e8;
+    --cream: #ede7d6;
+    --red: #1d6a8f;         /* azulejo blue — section labels, route, criteria bar */
+    --gold: #b8860b;
+    --muted: #7a7062;
+    --border: #d4c9b0;
+    --detour: #1a4a2e;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--paper); color: var(--ink); font-family: 'DM Sans', sans-serif; font-weight: 300; line-height: 1.6; }
+
+  .header { background: var(--ink); color: var(--paper); padding: 60px 40px 50px; position: relative; overflow: hidden; }
+  .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(255,255,255,0.015) 40px, rgba(255,255,255,0.015) 41px); }
+  .header-inner { max-width: 900px; margin: 0 auto; position: relative; }
+  .header-tag { font-weight: 500; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+  .header h1 { font-family: 'Playfair Display', serif; font-size: clamp(42px, 7vw, 80px); font-weight: 900; line-height: 0.95; letter-spacing: -2px; margin-bottom: 20px; }
+  .header h1 em { font-style: italic; font-weight: 400; color: var(--gold); }
+  .header-sub { font-size: 14px; color: rgba(245,240,232,0.6); font-weight: 300; letter-spacing: 0.05em; }
+  .header-meta { display: flex; gap: 32px; margin-top: 36px; padding-top: 28px; border-top: 1px solid rgba(255,255,255,0.12); flex-wrap: wrap; }
+  .meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .meta-label { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,240,232,0.4); }
+  .meta-val { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--paper); }
+
+  .criteria-bar { background: var(--red); padding: 14px 40px; }
+  .criteria-inner { max-width: 900px; margin: 0 auto; display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
+  .crit { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.92); letter-spacing: 0.04em; }
+  .crit-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.6); flex-shrink: 0; }
+
+  .main { max-width: 900px; margin: 0 auto; padding: 0 40px 80px; }
+
+  .section { margin-top: 60px; }
+  .section-header { display: flex; align-items: baseline; gap: 16px; padding-bottom: 16px; border-bottom: 2px solid var(--ink); }
+  .section-day { font-size: 10px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--red); white-space: nowrap; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+  .section-note { font-size: 12px; color: var(--muted); font-style: italic; margin-left: auto; white-space: nowrap; }
+
+  .section-map { height: 180px; width: 100%; margin: 0 0 1px 0; border: 1px solid var(--border); border-top: none; overflow: hidden; position: relative; }
+  .section-map .leaflet-control-attribution { font-size: 8px !important; padding: 1px 4px !important; background: rgba(255,255,255,0.7) !important; }
+  .section-map .leaflet-control-zoom { display: none !important; }
+  .section-map .leaflet-grab { cursor: default; }
+  .hotel-tip { background: var(--gold); color: #fff; border: none; box-shadow: 0 1px 4px rgba(0,0,0,0.3); font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 3px; letter-spacing: 0.04em; }
+  .hotel-tip::before { display: none; }
+
+  .sub-label { display: flex; flex-wrap: wrap; align-items: baseline; gap: 3px 12px; margin: 36px 0 10px; padding: 11px 16px; background: var(--cream); border-left: 4px solid var(--gold); border-radius: 2px; }
+  .sub-label-main { font-size: 14px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); }
+  .sub-label-note { font-size: 11px; font-weight: 400; color: var(--muted); letter-spacing: 0.02em; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 1px; }
+
+  .card { background: var(--paper); position: relative; transition: background 0.15s; display: flex; flex-direction: column; }
+  .card-body { display: block; text-decoration: none; color: inherit; padding: 20px 22px 14px; position: relative; cursor: pointer; transition: background 0.15s; }
+  .card-body:hover { background: var(--cream); }
+  .card-body::after { content: '↗'; position: absolute; top: 14px; right: 14px; font-size: 11px; color: var(--muted); opacity: 0; transition: opacity 0.15s; font-weight: 500; }
+  .card-body:hover::after { opacity: 1; }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 8px; padding-right: 16px; }
+  .card-name { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; line-height: 1.2; letter-spacing: -0.2px; }
+  .card-badges { display: flex; gap: 4px; flex-shrink: 0; align-items: flex-start; flex-wrap: wrap; justify-content: flex-end; }
+  .badge { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; padding: 3px 7px; border-radius: 2px; white-space: nowrap; }
+  .badge-price-1 { background: #e8f5e9; color: #2e7d32; }
+  .badge-price-2 { background: #fff3e0; color: #e65100; }
+  .badge-flag { background: var(--ink); color: var(--paper); }
+  .badge-healthy { background: #e3f2ed; color: #1a7a55; }
+  .card-meta { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+  .card-stars { font-size: 11px; font-weight: 500; color: var(--gold); letter-spacing: 0.02em; }
+  .card-reviews { font-size: 11px; color: var(--muted); font-weight: 300; }
+  .card-note { font-size: 12px; color: var(--muted); font-weight: 300; line-height: 1.5; border-top: 1px solid var(--border); padding-top: 10px; margin-top: 2px; }
+  .card-actions { display: flex; margin-top: auto; border-top: 1px solid var(--border); }
+  .card-action { flex: 1; text-align: center; padding: 9px 8px; font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: background 0.15s, color 0.15s; }
+  .card-action + .card-action { border-left: 1px solid var(--border); }
+  .card-action:hover { background: var(--cream); color: var(--ink); }
+
+  .card.standout { background: var(--ink); color: var(--paper); }
+  .card.standout .card-name { color: var(--paper); }
+  .card.standout .card-reviews { color: rgba(245,240,232,0.5); }
+  .card.standout .card-stars { color: var(--gold); }
+  .card.standout .card-note { color: rgba(245,240,232,0.6); border-color: rgba(255,255,255,0.12); }
+  .card.standout .card-body:hover { background: #2a2420; }
+  .card.standout .badge-price-1 { background: rgba(46,125,50,0.3); color: #a5d6a7; }
+  .card.standout .badge-price-2 { background: rgba(230,81,0,0.3); color: #ffcc80; }
+  .card.standout .badge-healthy { background: rgba(26,122,85,0.35); color: #9fe0c2; }
+  .card.standout .badge-flag { background: rgba(255,255,255,0.15); color: var(--paper); }
+  .card.standout .card-body::after { color: rgba(245,240,232,0.4); }
+  .card.standout .card-actions { border-color: rgba(255,255,255,0.12); }
+  .card.standout .card-action { color: rgba(245,240,232,0.55); }
+  .card.standout .card-action + .card-action { border-color: rgba(255,255,255,0.12); }
+  .card.standout .card-action:hover { background: #2a2420; color: var(--paper); }
+
+  .toppick { margin: 0 0 6px; padding: 16px 18px; background: var(--ink); border-radius: 3px; }
+  .toppick-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 12px; }
+  .toppick-list { display: flex; flex-direction: column; gap: 9px; }
+  .toppick-item { display: block; text-decoration: none; color: var(--paper); line-height: 1.35; }
+  .toppick-item .tp-name { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 15px; }
+  .toppick-item .tp-name::after { content: ' ↗'; font-size: 10px; color: rgba(245,240,232,0.4); }
+  .toppick-item .tp-why { display: block; font-size: 12px; color: rgba(245,240,232,0.6); font-weight: 300; }
+  .toppick-item:hover .tp-name { color: var(--gold); }
+
+  .essentials { background: var(--paper); border: 1px solid var(--border); border-top: none; }
+  .ess-row { display: flex; align-items: baseline; gap: 12px; padding: 13px 22px; border-bottom: 1px solid var(--border); text-decoration: none; color: inherit; transition: background 0.15s; }
+  .ess-row:last-child { border-bottom: none; }
+  .ess-row:hover { background: var(--cream); }
+  .ess-tag { flex-shrink: 0; width: 82px; font-size: 9px; font-weight: 600; letter-spacing: 0.11em; text-transform: uppercase; color: var(--gold); padding-top: 4px; }
+  .ess-content { flex: 1; }
+  .ess-name { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; line-height: 1.25; }
+  .ess-name::after { content: ' ↗'; font-size: 10px; color: var(--muted); opacity: 0; transition: opacity 0.15s; }
+  .ess-row:hover .ess-name::after { opacity: 1; }
+  .ess-why { font-size: 12px; color: var(--muted); font-weight: 300; line-height: 1.45; margin-top: 3px; }
+
+  .intro-box { background: var(--cream); border-left: 3px solid var(--gold); border-radius: 3px; padding: 18px 22px; margin-top: 28px; }
+  .intro-title { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 11px; }
+  .intro-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .intro-list li { font-size: 13px; color: var(--ink); line-height: 1.5; padding-left: 16px; position: relative; }
+  .intro-list li::before { content: '›'; position: absolute; left: 2px; color: var(--gold); font-weight: 700; }
+  .intro-list strong { font-weight: 500; }
+
+  .footer { background: var(--ink); color: var(--paper); padding: 40px; margin-top: 80px; }
+  .footer-inner { max-width: 900px; margin: 0 auto; }
+  .footer-title { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; margin-bottom: 16px; color: var(--gold); }
+  .legend { display: flex; gap: 32px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(245,240,232,0.7); }
+  .footer-note { margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: rgba(245,240,232,0.35); line-height: 1.6; }
+
+  @media (max-width: 600px) {
+    .header, .criteria-bar, .main, .footer { padding-left: 24px; padding-right: 24px; }
+    .header-meta { gap: 20px; }
+    .grid { grid-template-columns: 1fr; }
+    .section-note { display: none; }
+    .section-map { height: 150px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="header-tag">Mom &amp; Dad — July 2026</div>
+    <h1>Where to<br><em>Eat</em> in Portugal</h1>
+    <div class="header-sub">Porto · Coimbra · Cascais · Lisbon — 11 days, July 3–14 · Tap any card to open it in Google Maps</div>
+    <div class="header-meta">
+      <div class="meta-item"><span class="meta-label">Stops</span><span class="meta-val">4</span></div>
+      <div class="meta-item"><span class="meta-label">Min. Reviews</span><span class="meta-val">500</span></div>
+      <div class="meta-item"><span class="meta-label">Min. Rating</span><span class="meta-val">4.0★</span></div>
+      <div class="meta-item"><span class="meta-label">Max. per person</span><span class="meta-val">$80 CAD</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="criteria-bar">
+  <div class="criteria-inner">
+    <div class="crit"><div class="crit-dot"></div>$ = under ~$20 CAD · $$ = $20–80 CAD</div>
+    <div class="crit"><div class="crit-dot"></div>Dark card = top pick</div>
+    <div class="crit"><div class="crit-dot"></div>🌿 = lighter / healthy option</div>
+    <div class="crit"><div class="crit-dot"></div>⚑ = check price or hours first</div>
+  </div>
+</div>
+
+<main class="main">
+
+  <div class="intro-box">
+    <div class="intro-title">Before you go</div>
+    <ul class="intro-list">
+      <li><strong>Book the top picks.</strong> July is peak season — reserve the dark-card spots a day or two ahead, especially the small ones (DAMA, Zé Manel, A Nossa Casa). Many seat 16–30 people.</li>
+      <li><strong>Meal times run late.</strong> Lunch ~12:30–3, dinner ~7:30–10:30. Kitchens at some spots don't open until 7. A few close one or two days a week — closures are noted on each card.</li>
+      <li><strong>Carry some cash.</strong> A handful of the best old-school places (Zé Manel in Coimbra, a couple of Porto taverns) are cash-only.</li>
+      <li><strong>Healthy choices everywhere.</strong> Grilled fish, fresh seafood, and big salads are the Portuguese default. Each leg also has dedicated lighter/veg-forward spots marked 🌿.</li>
+      <li><strong>Everything is tappable</strong> &rarr; opens in Google Maps, with <strong>Directions</strong> and <strong>Call</strong> on each card. Works offline once loaded (add it to your home screen).</li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════ PORTO ═══════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-day">Jul 3–6 · Stop 1</span>
+      <h2 class="section-title">Porto</h2>
+      <span class="section-note">A.S. 1829 Hotel · central, by Aliados</span>
+    </div>
+    <div class="section-map" id="map-porto"></div>
+
+    <div class="toppick">
+      <div class="toppick-label">If you only do three</div>
+      <div class="toppick-list">
+        <a class="toppick-item" href="https://www.google.com/maps/search/?api=1&query=DAMA%20pe%20de%20cabra&query_place_id=ChIJj2WnPu9kJA0RtToi37tMeqs" target="_blank" rel="noopener"><span class="tp-name">DAMA pé de cabra</span><span class="tp-why">Tiny owner-run room — the most personal Portuguese meal in the city (Thu–Sat only)</span></a>
+        <a class="toppick-item" href="https://www.google.com/maps/search/?api=1&query=The%20Door%20Porto&query_place_id=ChIJa4rq8nZlJA0Re3QVSXMXgX0" target="_blank" rel="noopener"><span class="tp-name">The Door</span><span class="tp-why">Buzzy small plates — nori tacos, scallops; the city's most-loved dinner</span></a>
+        <a class="toppick-item" href="https://www.google.com/maps/search/?api=1&query=Manteigaria%20Clerigos&query_place_id=ChIJEZ6T3_5lJA0RK-OYoZM1awA" target="_blank" rel="noopener"><span class="tp-name">Manteigaria</span><span class="tp-why">The benchmark pastel de nata, warm from the oven, steps from your hotel</span></a>
+      </div>
+    </div>
+
+    <div class="sub-label"><span class="sub-label-main">Dinner</span><span class="sub-label-note">sorted by rating · closures noted</span></div>
+    <div class="grid">
+
+      <div class="card standout">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=DAMA%20pe%20de%20cabra&query_place_id=ChIJj2WnPu9kJA0RtToi37tMeqs" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">DAMA pé de cabra</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.9</span><span class="card-reviews">1,441 reviews</span></div>
+          <div class="card-note">Six-table gem; the owner walks you through wines and regional dishes. Chestnut bread, octopus. Open Thu–Sat evenings only — book ahead.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=DAMA%20pe%20de%20cabra&destination_place_id=ChIJj2WnPu9kJA0RtToi37tMeqs" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351913754955">Call</a></div>
+      </div>
+
+      <div class="card standout">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=The%20Door%20Porto&query_place_id=ChIJa4rq8nZlJA0Re3QVSXMXgX0" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">The Door</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">2,232 reviews</span></div>
+          <div class="card-note">Small, cozy, indoor/terrace seating. Famous nori tacos, tender scallops, "just a salad." Open daily; reserve.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=The%20Door%20Porto&destination_place_id=ChIJa4rq8nZlJA0Re3QVSXMXgX0" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351964963136">Call</a></div>
+      </div>
+
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=A%20Despensa%20Porto&query_place_id=ChIJKUXs_uJkJA0RFMpDf17u-f4" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">A Despensa</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">6,160 reviews</span></div>
+          <div class="card-note">Intimate Italian down a narrow alley; homemade pasta and pesto, strong gluten-free options. Closed Mon.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=A%20Despensa%20Porto&destination_place_id=ChIJKUXs_uJkJA0RFMpDf17u-f4" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351933962261">Call</a></div>
+      </div>
+
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Bota%20%26%20Bira%20Porto&query_place_id=ChIJR9mM3uFkJA0RINhvAzWXWCc" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Bota &amp; Bira</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">2,404 reviews</span></div>
+          <div class="card-note">For a steak night — superb tartare and T-bone, fair prices. Closed Sun &amp; Mon; book.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Bota%20%26%20Bira%20Porto&destination_place_id=ChIJR9mM3uFkJA0RINhvAzWXWCc" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351960244918">Call</a></div>
+      </div>
+
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=The%20Ribs%20Porto&query_place_id=ChIJcTCuaudlJA0R9M9PgMsY670" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">The Ribs</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">1,411 reviews</span></div>
+          <div class="card-note">Charcoal ribs and dry-aged steak in a casual room; tempura green beans to start. Closed Sun &amp; Mon.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=The%20Ribs%20Porto&destination_place_id=ChIJcTCuaudlJA0R9M9PgMsY670" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351222086712">Call</a></div>
+      </div>
+
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Almada%20Terrace%20Porto&query_place_id=ChIJPThLL8tlJA0RuF-2eoMT_fg" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Almada Terrace</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">1,360 reviews</span></div>
+          <div class="card-note">Warm service, melt-through octopus and garlic prawns, a port tasting to finish. Closed Sun.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Almada%20Terrace%20Porto&destination_place_id=ChIJPThLL8tlJA0RuF-2eoMT_fg" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351917621196">Call</a></div>
+      </div>
+
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Brasao%20Aliados%20Porto&query_place_id=ChIJ_dfatPxkJA0RdeN-V4teCuw" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Brasão Aliados</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.6</span><span class="card-reviews">16,642 reviews</span></div>
+          <div class="card-note">Big, lively, two-minute walk from your hotel; the famous francesinha, octopus with green sauce. Open daily — good walk-in option.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Brasao%20Aliados%20Porto&destination_place_id=ChIJ_dfatPxkJA0RdeN-V4teCuw" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351934158672">Call</a></div>
+      </div>
+
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Bacalhau%20Porto&query_place_id=ChIJMTxEH-BkJA0RHKaU_xuGBNo" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Bacalhau</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.6</span><span class="card-reviews">4,617 reviews</span></div>
+          <div class="card-note">Calm riverside room; codfish done well — cod crudo, crispy cod skins, homemade lemonade. Open daily.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Bacalhau%20Porto&destination_place_id=ChIJMTxEH-BkJA0RHKaU_xuGBNo" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351960378883">Call</a></div>
+      </div>
+
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Taberna%20dos%20Mercadores%20Porto&query_place_id=ChIJgy4W_OBkJA0RUZIgTRYC8zw" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Taberna dos Mercadores</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.5</span><span class="card-reviews">3,828 reviews</span></div>
+          <div class="card-note">Beloved 16-seat tavern; baked octopus rice, salt-baked sea bass. Closed Mon; arrive early or expect a queue.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Taberna%20dos%20Mercadores%20Porto&destination_place_id=ChIJgy4W_OBkJA0RUZIgTRYC8zw" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351222010510">Call</a></div>
+      </div>
+
+    </div>
+
+    <div class="sub-label"><span class="sub-label-main">🌿 Lighter &amp; fresh</span><span class="sub-label-note">salads · bowls · juices</span></div>
+    <div class="grid">
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=NOLA%20Kitchen%20Porto&query_place_id=ChIJQcQqDghlJA0RWYJJPTN8srY" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">NOLA Kitchen</div><div class="card-badges"><span class="badge badge-healthy">🌿</span><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.6</span><span class="card-reviews">3,575 reviews</span></div>
+          <div class="card-note">Fresh, wholefood cooking — salmon curry bowl, overnight oats, juices and matcha. Open daily till 11pm.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=NOLA%20Kitchen%20Porto&destination_place_id=ChIJQcQqDghlJA0RWYJJPTN8srY" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351910595015">Call</a></div>
+      </div>
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Honest%20Greens%20Porto&query_place_id=ChIJt5i7mb5lJA0RmRxMVJNjyUk" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Honest Greens (Santa Catarina)</div><div class="card-badges"><span class="badge badge-healthy">🌿</span><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.3</span><span class="card-reviews">3,630 reviews</span></div>
+          <div class="card-note">Big, veg-forward plates and salads (Mediterranean bowl, roast veg), bottomless infused water. Open daily till 11pm.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Honest%20Greens%20Porto&destination_place_id=ChIJt5i7mb5lJA0RmRxMVJNjyUk" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351923217520">Call</a></div>
+      </div>
+    </div>
+
+    <div class="sub-label"><span class="sub-label-main">Beyond Dinner</span><span class="sub-label-note">nata · coffee · the market</span></div>
+    <div class="essentials">
+      <a class="ess-row" href="https://www.google.com/maps/search/?api=1&query=Manteigaria%20Clerigos&query_place_id=ChIJEZ6T3_5lJA0RK-OYoZM1awA" target="_blank" rel="noopener"><div class="ess-tag">Pastel de Nata</div><div class="ess-content"><div class="ess-name">Manteigaria — Clérigos</div><div class="ess-why">The city benchmark, €1.50, warm from the oven; watch them made. By Clérigos Tower, near your hotel.</div></div></a>
+      <a class="ess-row" href="https://www.google.com/maps/search/?api=1&query=Castro%20Pasteis%20de%20Nata%20Porto&query_place_id=ChIJL6KnMVVlJA0RaEeJAih-CUU" target="_blank" rel="noopener"><div class="ess-tag">Pastel de Nata</div><div class="ess-content"><div class="ess-name">Castro — Atelier de Pastéis de Nata</div><div class="ess-why">The locals' pick; custard that holds, crisp not flaky crust. A few seats inside.</div></div></a>
+      <a class="ess-row" href="https://www.google.com/maps/search/?api=1&query=Combi%20Coffee%20Roasters%20Porto&query_place_id=ChIJvd30NFtkJA0RJgIg3FK76zc" target="_blank" rel="noopener"><div class="ess-tag">Coffee</div><div class="ess-content"><div class="ess-name">Combi Coffee Roasters</div><div class="ess-why">Best specialty coffee in town — house roastery, daily roast, friendly. Closes ~5pm.</div></div></a>
+      <a class="ess-row" href="https://www.google.com/maps/search/?api=1&query=Bolhao%20Market%20Porto&query_place_id=ChIJFQzXJeVkJA0R6XxuGdsidvE" target="_blank" rel="noopener"><div class="ess-tag">Market</div><div class="ess-content"><div class="ess-name">Mercado do Bolhão</div><div class="ess-why">Beautifully restored market hall — go ~9am, grab a €3 glass of wine and oysters. Closed Sun.</div></div></a>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ COIMBRA ═══════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-day">Jul 6–8 · Stop 2</span>
+      <h2 class="section-title">Coimbra</h2>
+      <span class="section-note">Quinta das Lágrimas · old town across the river</span>
+    </div>
+    <div class="section-map" id="map-coimbra"></div>
+
+    <div class="toppick">
+      <div class="toppick-label">Don't miss</div>
+      <div class="toppick-list">
+        <a class="toppick-item" href="https://www.google.com/maps/search/?api=1&query=Ze%20Manel%20dos%20Ossos%20Coimbra&query_place_id=ChIJaSB_0gf5Ig0RQpAh_yloaHY" target="_blank" rel="noopener"><span class="tp-name">Zé Manel dos Ossos</span><span class="tp-why">Iconic hole-in-the-wall tavern — hearty meat, full of locals. Cash only, get on the list ~30 min early</span></a>
+        <a class="toppick-item" href="https://www.google.com/maps/search/?api=1&query=Terraco%20da%20Alta%20Coimbra&query_place_id=ChIJ25zVSQn5Ig0RSJI0ySi7aWI" target="_blank" rel="noopener"><span class="tp-name">Terraço da Alta</span><span class="tp-why">Down an alley, up the hill — the best city view in Coimbra over dinner</span></a>
+      </div>
+    </div>
+
+    <div class="sub-label"><span class="sub-label-main">Dinner</span><span class="sub-label-note">all open Mon &amp; Tue (your nights)</span></div>
+    <div class="grid">
+
+      <div class="card standout">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Ze%20Manel%20dos%20Ossos%20Coimbra&query_place_id=ChIJaSB_0gf5Ig0RQpAh_yloaHY" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Zé Manel dos Ossos</div><div class="card-badges"><span class="badge badge-price-1">$</span><span class="badge badge-flag">⚑</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.7</span><span class="card-reviews">3,038 reviews</span></div>
+          <div class="card-note">A Coimbra institution — order the ossos and the chanfana. Cash only; tiny; arrive ~6:30pm to put your name down. Closed Sat &amp; Sun.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Ze%20Manel%20dos%20Ossos%20Coimbra&destination_place_id=ChIJaSB_0gf5Ig0RQpAh_yloaHY" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351239823790">Call</a></div>
+      </div>
+
+      <div class="card standout">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Restaurante%20Sete%20Coimbra&query_place_id=ChIJxd6jrAj5Ig0RvQOkWnMFNiY" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Restaurante Sete</div><div class="card-badges"><span class="badge badge-healthy">🌿</span><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.7</span><span class="card-reviews">2,311 reviews</span></div>
+          <div class="card-note">Traditional Portuguese with a creative touch and a deep wine list; grilled octopus, lamb shank, and excellent vegetarian dishes. Open daily.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Restaurante%20Sete%20Coimbra&destination_place_id=ChIJxd6jrAj5Ig0RvQOkWnMFNiY" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351919138777">Call</a></div>
+      </div>
+
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Terraco%20da%20Alta%20Coimbra&query_place_id=ChIJ25zVSQn5Ig0RSJI0ySi7aWI" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Terraço da Alta</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.6</span><span class="card-reviews">1,841 reviews</span></div>
+          <div class="card-note">Hilltop terrace with sweeping views; tender pork cheeks, grilled octopus, seafood rice. Kitchen opens 7pm — go for sunset.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Terraco%20da%20Alta%20Coimbra&destination_place_id=ChIJ25zVSQn5Ig0RSJI0ySi7aWI" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351927318578">Call</a></div>
+      </div>
+
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Solar%20do%20Bacalhau%20Coimbra&query_place_id=ChIJ3eyJSQb5Ig0R0VVb7tbugCY" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Solar do Bacalhau</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.4</span><span class="card-reviews">5,944 reviews</span></div>
+          <div class="card-note">Roomy, plant-filled space with many codfish preparations and roasted veg; plenty of seating, easy walk-in. Open daily.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Solar%20do%20Bacalhau%20Coimbra&destination_place_id=ChIJ3eyJSQb5Ig0R0VVb7tbugCY" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351239098990">Call</a></div>
+      </div>
+
+    </div>
+
+    <div class="sub-label"><span class="sub-label-main">Beyond Dinner</span><span class="sub-label-note">pastry · coffee</span></div>
+    <div class="essentials">
+      <a class="ess-row" href="https://www.google.com/maps/search/?api=1&query=Briosa%20Coimbra&query_place_id=ChIJCY4Tdwj5Ig0RU1Vo7p7XtY4" target="_blank" rel="noopener"><div class="ess-tag">Pastry</div><div class="ess-content"><div class="ess-name">Briosa</div><div class="ess-why">The city's classic pastelaria on Largo da Portagem — try the regional Pastel de Tentúgal. Open daily.</div></div></a>
+      <a class="ess-row" href="https://www.google.com/maps/search/?api=1&query=Nau%20Coffee%20Coimbra&query_place_id=ChIJ5YLo0Lj5Ig0RL_IE-T85hqw" target="_blank" rel="noopener"><div class="ess-tag">Coffee · Brunch</div><div class="ess-content"><div class="ess-name">Nau Coffee Brunch</div><div class="ess-why">Lovely specialty-coffee and brunch spot below the university; fresh plates, hummus &amp; veg, great service.</div></div></a>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ CASCAIS ═══════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-day">Jul 8–10 · Stop 3</span>
+      <h2 class="section-title">Cascais</h2>
+      <span class="section-note">Fortaleza do Guincho · ~7 km from town, on the beach</span>
+    </div>
+    <div class="section-map" id="map-cascais"></div>
+
+    <div class="toppick">
+      <div class="toppick-label">Don't miss</div>
+      <div class="toppick-list">
+        <a class="toppick-item" href="https://www.google.com/maps/search/?api=1&query=Mar%20do%20Guincho&query_place_id=ChIJBRsz_wbEHg0RLU5Jot1n1xI" target="_blank" rel="noopener"><span class="tp-name">Mar do Guincho</span><span class="tp-why">Fresh fish by the beach near your hotel — filleted at the table, big Atlantic views</span></a>
+        <a class="toppick-item" href="https://www.google.com/maps/search/?api=1&query=Taberna%20Clandestina%20Cascais&query_place_id=ChIJU9_Dcy_EHg0Rq9-dpcBMCkY" target="_blank" rel="noopener"><span class="tp-name">Taberna Clandestina</span><span class="tp-why">The town's most-loved table — pork cheeks, octopus, pasta, on a buzzy restaurant lane</span></a>
+      </div>
+    </div>
+
+    <div class="sub-label"><span class="sub-label-main">In town</span><span class="sub-label-note">~10 min drive from the hotel · all open Wed &amp; Thu</span></div>
+    <div class="grid">
+
+      <div class="card standout">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Taberna%20Clandestina%20Cascais&query_place_id=ChIJU9_Dcy_EHg0Rq9-dpcBMCkY" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Taberna Clandestina</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.7</span><span class="card-reviews">3,608 reviews</span></div>
+          <div class="card-note">Generous, well-priced plates from pasta to seafood — pork cheeks, octopus, burrata. Lively; can wait. Open daily.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Taberna%20Clandestina%20Cascais&destination_place_id=ChIJU9_Dcy_EHg0Rq9-dpcBMCkY" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351916229630">Call</a></div>
+      </div>
+
+      <div class="card standout">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Hifen%20Cascais&query_place_id=ChIJFaKnFy7EHg0Rs45k6DCl7wI" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Hífen</div><div class="card-badges"><span class="badge badge-healthy">🌿</span><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.6</span><span class="card-reviews">2,839 reviews</span></div>
+          <div class="card-note">Creative small plates served upstairs with an ocean view; tempura veg, secretos, good vegetarian picks. Open daily; book ahead.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Hifen%20Cascais&destination_place_id=ChIJFaKnFy7EHg0Rs45k6DCl7wI" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351915546537">Call</a></div>
+      </div>
+
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=A%20Nova%20Estrela%20Cascais&query_place_id=ChIJ4Sd4cC_EHg0RhtrX-q9xppo" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">A Nova Estrela</div><div class="card-badges"><span class="badge badge-price-1">$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.7</span><span class="card-reviews">4,076 reviews</span></div>
+          <div class="card-note">Tiny, authentic family spot off the tourist track; octopus à lagareiro and a legendary chocolate lava cake. Dinner 6:30–9:30; closed Sun.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=A%20Nova%20Estrela%20Cascais&destination_place_id=ChIJ4Sd4cC_EHg0RhtrX-q9xppo" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351960344831">Call</a></div>
+      </div>
+
+    </div>
+
+    <div class="sub-label"><span class="sub-label-main">By the beach (near your hotel)</span><span class="sub-label-note">Guincho seafood</span></div>
+    <div class="grid">
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Mar%20do%20Guincho&query_place_id=ChIJBRsz_wbEHg0RLU5Jot1n1xI" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Mar do Guincho</div><div class="card-badges"><span class="badge badge-price-2">$$</span><span class="badge badge-flag">⚑</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.5</span><span class="card-reviews">1,398 reviews</span></div>
+          <div class="card-note">Bright beachfront seafood near your hotel; the catch is filleted tableside. Whole fish is priced by weight — order à la carte to stay in budget. (Pricier sibling Furnas do Guincho is next door if you want to splurge.)</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Mar%20do%20Guincho&destination_place_id=ChIJBRsz_wbEHg0RLU5Jot1n1xI" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351214858280">Call</a></div>
+      </div>
+    </div>
+
+    <div class="sub-label"><span class="sub-label-main">🌿 Lighter &amp; fresh</span><span class="sub-label-note">salads · bowls · veg</span></div>
+    <div class="grid">
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=House%20of%20Wonders%20Cascais&query_place_id=ChIJPQiMXy7EHg0Rw3Hi0c6K9Zg" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">House of Wonders</div><div class="card-badges"><span class="badge badge-healthy">🌿</span><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.5</span><span class="card-reviews">3,212 reviews</span></div>
+          <div class="card-note">Colourful all-vegetarian spot with a rooftop; the "kitchen sink" salad and homemade lemonade are the move. Open daily till 11pm.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=House%20of%20Wonders%20Cascais&destination_place_id=ChIJPQiMXy7EHg0Rw3Hi0c6K9Zg" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351911702428">Call</a></div>
+      </div>
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Honest%20Greens%20Cascais&query_place_id=ChIJU3fcOADFHg0ROKvydVGZfcs" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Honest Greens (Estação)</div><div class="card-badges"><span class="badge badge-healthy">🌿</span><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.2</span><span class="card-reviews">531 reviews</span></div>
+          <div class="card-note">Fast, fresh, well-priced market plates (lemon-mustard chicken, falafel), free fruit-water refills, lots of terrace space. Open daily.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Honest%20Greens%20Cascais&destination_place_id=ChIJU3fcOADFHg0ROKvydVGZfcs" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351923217520">Call</a></div>
+      </div>
+    </div>
+
+    <div class="sub-label"><span class="sub-label-main">Beyond Dinner</span><span class="sub-label-note">nata · coffee</span></div>
+    <div class="essentials">
+      <a class="ess-row" href="https://www.google.com/maps/search/?api=1&query=Nata%20Lisboa%20Cascais&query_place_id=ChIJqzR9qC_EHg0RAbhnNiAYLdY" target="_blank" rel="noopener"><div class="ess-tag">Pastel de Nata</div><div class="ess-content"><div class="ess-name">NATA Lisboa — Cascais</div><div class="ess-why">The best nata in town with good coffee, right on the main strip; shaded outdoor seats. Open daily.</div></div></a>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ LISBON ═══════════════════ -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-day">Jul 10–14 · Stop 4</span>
+      <h2 class="section-title">Lisbon</h2>
+      <span class="section-note">The Vintage · Avenida da Liberdade / Rato</span>
+    </div>
+    <div class="section-map" id="map-lisbon"></div>
+
+    <div class="toppick">
+      <div class="toppick-label">If you only do three</div>
+      <div class="toppick-list">
+        <a class="toppick-item" href="https://www.google.com/maps/search/?api=1&query=A%20Nossa%20Casa%20Lisboa&query_place_id=ChIJcVPiRjk1GQ0R4E4ckO3whcA" target="_blank" rel="noopener"><span class="tp-name">A Nossa Casa</span><span class="tp-why">Bairro Alto's "best meal of our trip" room — book ahead, dinner only</span></a>
+        <a class="toppick-item" href="https://www.google.com/maps/search/?api=1&query=Bessa%20Lisboa&query_place_id=ChIJ9xdTTXg0GQ0RutKXNBrE3_0" target="_blank" rel="noopener"><span class="tp-name">Bessa</span><span class="tp-why">Calm, generous seafood — the octopus rice is the city at its best for the price</span></a>
+        <a class="toppick-item" href="https://www.google.com/maps/search/?api=1&query=Manteigaria%20Lisboa&query_place_id=ChIJcxYntH80GQ0RX2Him1Z7r-g" target="_blank" rel="noopener"><span class="tp-name">Manteigaria (Chiado)</span><span class="tp-why">The nata to beat — crisp, warm, €1.50, watch them baked</span></a>
+      </div>
+    </div>
+
+    <div class="sub-label"><span class="sub-label-main">Dinner</span><span class="sub-label-note">near the hotel &amp; central</span></div>
+    <div class="grid">
+
+      <div class="card standout">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=A%20Nossa%20Casa%20Lisboa&query_place_id=ChIJcVPiRjk1GQ0R4E4ckO3whcA" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">A Nossa Casa</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">2,429 reviews</span></div>
+          <div class="card-note">Intimate Bairro Alto room, East-meets-Portugal flavours; grilled scallops, Angus tartare, Iberian pork. Dinner only 6:30–10:30, daily; book.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=A%20Nossa%20Casa%20Lisboa&destination_place_id=ChIJcVPiRjk1GQ0R4E4ckO3whcA" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351213420484">Call</a></div>
+      </div>
+
+      <div class="card standout">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Santa%20Marta%20Lisboa&query_place_id=ChIJ9Uz0X9ozGQ0Rk1M3Ve5Onrc" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Santa Marta Mediterranean</div><div class="card-badges"><span class="badge badge-healthy">🌿</span><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">2,277 reviews</span></div>
+          <div class="card-note">Warm Mediterranean kitchen near the hotel; grilled swordfish, pumpkin soup, bitoque, plus lighter veg plates. Open daily noon–11.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Santa%20Marta%20Lisboa&destination_place_id=ChIJ9Uz0X9ozGQ0Rk1M3Ve5Onrc" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351916404726">Call</a></div>
+      </div>
+
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Copo%20de%20Mar%20Lisboa&query_place_id=ChIJbZNv5-4zGQ0RiYA0UJccgsA" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Copo de Mar</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">1,590 reviews</span></div>
+          <div class="card-note">Cosy seafood-leaning Mediterranean; baked cod with parsley pesto, shrimp ravioli, great wine guidance. Closed Sun.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Copo%20de%20Mar%20Lisboa&destination_place_id=ChIJbZNv5-4zGQ0RiYA0UJccgsA" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351217960774">Call</a></div>
+      </div>
+
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Salta%20Lisboa&query_place_id=ChIJVV-IIwQzGQ0RskObH-RRdwk" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Salta</div><div class="card-badges"><span class="badge badge-price-2">$$</span><span class="badge badge-flag">⚑</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">1,075 reviews</span></div>
+          <div class="card-note">Stylish Asian fusion right on your hotel's street; soft-shell crab tacos, tuna crudo, a vegan tasting option. Dinner 7–midnight daily. À la carte keeps it in budget.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Salta%20Lisboa&destination_place_id=ChIJVV-IIwQzGQ0RskObH-RRdwk" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351211325822">Call</a></div>
+      </div>
+
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=El%20Clan%20Lisboa&query_place_id=ChIJK28t2n0zGQ0RYMqW_EO5Mns" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">El Clan</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.7</span><span class="card-reviews">4,692 reviews</span></div>
+          <div class="card-note">Friendly, good-value Portuguese; standout seafood rice and paellas, refreshing fruit ceviche. Open daily till midnight.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=El%20Clan%20Lisboa&destination_place_id=ChIJK28t2n0zGQ0RYMqW_EO5Mns" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351963878863">Call</a></div>
+      </div>
+
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=A%20Cozinha%20Sr%20Lisboa&query_place_id=ChIJCxwzRIIzGQ0RC3wjGWOmGKw" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">A Cozinha — Sr. Lisboa</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.6</span><span class="card-reviews">2,460 reviews</span></div>
+          <div class="card-note">Cosy spot near the hotel for Portuguese sharing plates; the piri-piri chicken and octopus are the picks. Open daily till midnight.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=A%20Cozinha%20Sr%20Lisboa&destination_place_id=ChIJCxwzRIIzGQ0RC3wjGWOmGKw" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351213423512">Call</a></div>
+      </div>
+
+    </div>
+
+    <div class="sub-label"><span class="sub-label-main">Seafood</span><span class="sub-label-note">octopus rice · grilled fish · clams</span></div>
+    <div class="grid">
+      <div class="card standout">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Bessa%20Lisboa&query_place_id=ChIJ9xdTTXg0GQ0RutKXNBrE3_0" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Bessa</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">6,788 reviews</span></div>
+          <div class="card-note">Calm, generous, well-seasoned seafood; the octopus rice and grilled sea bass are excellent value. Open daily till 11.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Bessa%20Lisboa&destination_place_id=ChIJ9xdTTXg0GQ0RutKXNBrE3_0" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351218860315">Call</a></div>
+      </div>
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Frade%20dos%20Mares%20Lisboa&query_place_id=ChIJdTVGvYM0GQ0RWjKJ5nUblhg" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Frade dos Mares</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.7</span><span class="card-reviews">3,575 reviews</span></div>
+          <div class="card-note">Refined seafood near the hotel; clams, tuna ceviche, arroz de marisco, pudim with port. Open daily; book.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Frade%20dos%20Mares%20Lisboa&destination_place_id=ChIJdTVGvYM0GQ0RWjKJ5nUblhg" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351213909418">Call</a></div>
+      </div>
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Uma%20Marisqueira%20Lisboa&query_place_id=ChIJU0ckwHg0GQ0RGFRTQgsiyxU" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Uma Marisqueira</div><div class="card-badges"><span class="badge badge-price-1">$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.6</span><span class="card-reviews">24,435 reviews</span></div>
+          <div class="card-note">One famous dish done brilliantly — a seafood rice pot, available in single portions; outstanding value. Open daily; go early.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Uma%20Marisqueira%20Lisboa&destination_place_id=ChIJU0ckwHg0GQ0RGFRTQgsiyxU" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351962379399">Call</a></div>
+      </div>
+    </div>
+
+    <div class="sub-label"><span class="sub-label-main">Petiscos &amp; wine</span><span class="sub-label-note">small plates to share</span></div>
+    <div class="grid">
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Tapa%20do%20Bairro%20Alto%20Lisboa&query_place_id=ChIJR30HBgs1GQ0Ro5KGgIIgMf8" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Tapa do BairroAlto</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">1,538 reviews</span></div>
+          <div class="card-note">Small, charming tapas on a quiet Bairro Alto lane; bao buns, garlic shrimp, fruit-laden white sangria. Open daily.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Tapa%20do%20Bairro%20Alto%20Lisboa&destination_place_id=ChIJR30HBgs1GQ0Ro5KGgIIgMf8" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351963012182">Call</a></div>
+      </div>
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Prova%20Tapas%20Lisboa&query_place_id=ChIJYcsd7YM1GQ0RkGgJ7HYcwI4" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Prova O Melhor Tapas</div><div class="card-badges"><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">1,340 reviews</span></div>
+          <div class="card-note">Attentive tapas spot; grilled gambas, octopus salad, deep-fried cod, blankets for the terrace. Open daily till 11.</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Prova%20Tapas%20Lisboa&destination_place_id=ChIJYcsd7YM1GQ0RkGgJ7HYcwI4" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351920655665">Call</a></div>
+      </div>
+    </div>
+
+    <div class="sub-label"><span class="sub-label-main">🌿 Lighter &amp; fresh</span><span class="sub-label-note">brunch · bowls · juices</span></div>
+    <div class="grid">
+      <div class="card">
+        <a class="card-body" href="https://www.google.com/maps/search/?api=1&query=Wel%20Well%20Lisboa&query_place_id=ChIJJbh9i6czGQ0RRItSd6na2-o" target="_blank" rel="noopener">
+          <div class="card-top"><div class="card-name">Wel Well</div><div class="card-badges"><span class="badge badge-healthy">🌿</span><span class="badge badge-price-2">$$</span></div></div>
+          <div class="card-meta"><span class="card-stars">★ 4.8</span><span class="card-reviews">577 reviews</span></div>
+          <div class="card-note">Lovely Príncipe Real spot focused on healthy eating — roasted squash with labne, açaí, matcha, juices. Dinner Tue–Sat (Sun/Mon till 5pm).</div>
+        </a>
+        <div class="card-actions"><a class="card-action" href="https://www.google.com/maps/dir/?api=1&destination=Wel%20Well%20Lisboa&destination_place_id=ChIJJbh9i6czGQ0RRItSd6na2-o" target="_blank" rel="noopener">Directions</a><a class="card-action" href="tel:+351927466804">Call</a></div>
+      </div>
+    </div>
+
+    <div class="sub-label"><span class="sub-label-main">Beyond Dinner</span><span class="sub-label-note">the nata pilgrimage</span></div>
+    <div class="essentials">
+      <a class="ess-row" href="https://www.google.com/maps/search/?api=1&query=Manteigaria%20Lisboa&query_place_id=ChIJcxYntH80GQ0RX2Him1Z7r-g" target="_blank" rel="noopener"><div class="ess-tag">Pastel de Nata</div><div class="ess-content"><div class="ess-name">Manteigaria — Chiado</div><div class="ess-why">The city's benchmark nata; crisp, warm, €1.50, the queue moves fast. Open till midnight.</div></div></a>
+      <a class="ess-row" href="https://www.google.com/maps/search/?api=1&query=Fabrica%20da%20Nata%20Lisboa&query_place_id=ChIJK7Zl34AzGQ0R-jUI1Y3hR5g" target="_blank" rel="noopener"><div class="ess-tag">Pastel de Nata</div><div class="ess-content"><div class="ess-name">Fábrica da Nata — Restauradores</div><div class="ess-why">Central, near the hotel; nata plus coffee, fresh juice and a watch-them-bake conveyor overhead.</div></div></a>
+      <a class="ess-row" href="https://www.google.com/maps/search/?api=1&query=Pasteis%20de%20Belem&query_place_id=ChIJW3H9LkXLHg0RZZZttMb27_8" target="_blank" rel="noopener"><div class="ess-tag">Worth the trip</div><div class="ess-content"><div class="ess-name">Pastéis de Belém</div><div class="ess-why">The original 1837 recipe, out in Belém — pair it with the monastery and the tower. Takeaway line moves fast.</div></div></a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-title">Legend</div>
+    <div class="legend">
+      <div class="legend-item"><span class="badge badge-price-1" style="background:rgba(46,125,50,0.3);color:#a5d6a7;">$</span> Under ~$20 CAD/person</div>
+      <div class="legend-item"><span class="badge badge-price-2" style="background:rgba(230,81,0,0.3);color:#ffcc80;">$$</span> $20–80 CAD/person</div>
+      <div class="legend-item"><span class="badge badge-healthy" style="background:rgba(26,122,85,0.35);color:#9fe0c2;">🌿</span> Lighter / healthy option</div>
+      <div class="legend-item"><span class="badge badge-flag">⚑</span> Check price or hours first</div>
+      <div class="legend-item"><span style="width:20px;height:14px;background:#1a1614;display:inline-block;border-radius:2px;"></span> Top pick</div>
+    </div>
+    <div class="footer-note">
+      Built for Mom &amp; Dad's Portugal trip, July 3–14 2026. Every spot here meets: 500+ Google reviews · 4.0+ stars · under $80 CAD/person. Tapping a card opens Google Maps; each card also has Directions and Call. Sorted by star rating within each group, review count as tiebreaker. Hours and closures were accurate when built — double-check before a special trip. Map tiles © OpenStreetMap contributors.
+    </div>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  var ROUTE_STYLE = { color: '#1d6a8f', weight: 3, opacity: 0.85 };
+
+  function makeMap(id, center, zoom, hotel, spots) {
+    var el = document.getElementById(id);
+    if (!el || typeof L === 'undefined') return;
+    var m = L.map(id, {
+      center: center, zoom: zoom,
+      zoomControl: false, scrollWheelZoom: false, dragging: false,
+      touchZoom: false, doubleClickZoom: false, keyboard: false,
+      attributionControl: true
+    });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://openstreetmap.org/copyright">OSM</a>',
+      maxZoom: 19
+    }).addTo(m);
+    if (spots && spots.length) {
+      spots.forEach(function (s) {
+        L.circleMarker([s[0], s[1]], {
+          radius: 4, color: '#1d6a8f', weight: 2,
+          fillColor: '#1d6a8f', fillOpacity: 0.85
+        }).addTo(m);
+      });
+    }
+    if (hotel) {
+      L.circleMarker([hotel[0], hotel[1]], {
+        radius: 7, color: '#ffffff', weight: 2,
+        fillColor: '#b8860b', fillOpacity: 1
+      }).addTo(m).bindTooltip('Hotel', {
+        permanent: true, direction: 'top', className: 'hotel-tip', offset: [0, -6]
+      });
+    }
+    return m;
+  }
+
+  // PORTO — hotel: A.S. 1829 (central, by Aliados)
+  makeMap('map-porto', [41.1452, -8.6118], 14,
+    [41.1440, -8.6115],
+    [[41.1442,-8.6167],[41.1458,-8.6033],[41.1472,-8.6135],[41.1424,-8.6158],[41.1498,-8.6120],[41.1492,-8.6118],[41.1401,-8.6159],[41.1413,-8.6129]]);
+
+  // COIMBRA — hotel: Quinta das Lagrimas (south bank)
+  makeMap('map-coimbra', [40.2040, -8.4285], 14,
+    [40.1986, -8.4278],
+    [[40.2079,-8.4302],[40.2107,-8.4288],[40.2106,-8.4254],[40.2086,-8.4309]]);
+
+  // CASCAIS — hotel: Fortaleza do Guincho (~7km NW of town)
+  makeMap('map-cascais', [38.7150, -9.4470], 12,
+    [38.7330, -9.4717],
+    [[38.6982,-9.4217],[38.6962,-9.4203],[38.6981,-9.4221],[38.7268,-9.4754],[38.6985,-9.4193],[38.7001,-9.4189]]);
+
+  // LISBON — hotel: The Vintage (Avenida da Liberdade / Rato)
+  makeMap('map-lisbon', [38.7200, -9.1470], 13,
+    [38.7228, -9.1505],
+    [[38.7118,-9.1449],[38.7253,-9.1471],[38.7398,-9.1491],[38.7243,-9.1543],[38.7146,-9.1374],[38.7199,-9.1437],[38.7131,-9.1373],[38.7085,-9.1532],[38.7126,-9.1447]]);
+
+  // ── Offline support (PWA) ──
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () {});
+    });
+  }
+
+});
+</script>
+</body>
+</html>
