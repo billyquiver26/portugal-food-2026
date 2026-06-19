@@ -7,18 +7,18 @@
 <meta name="theme-color" content="#1d6a8f">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
   :root {
-    --ink: #1a1614;
-    --paper: #f5f0e8;
-    --cream: #ede7d6;
-    --red: #1d6a8f;         /* azulejo blue — section labels, route, criteria bar */
-    --gold: #b8860b;
-    --muted: #7a7062;
-    --border: #d4c9b0;
-    --detour: #1a4a2e;
+    --ink: #1f2a3d;
+    --paper: #f7f2e7;
+    --cream: #ece4d2;
+    --red: #1f5c9e;
+    --gold: #c1882e;
+    --muted: #877a64;
+    --border: #d9cfb8;
+    --detour: #2c6e4f;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: var(--paper); color: var(--ink); font-family: 'DM Sans', sans-serif; font-weight: 300; line-height: 1.6; }
@@ -27,13 +27,13 @@
   .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(255,255,255,0.015) 40px, rgba(255,255,255,0.015) 41px); }
   .header-inner { max-width: 900px; margin: 0 auto; position: relative; }
   .header-tag { font-weight: 500; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
-  .header h1 { font-family: 'Playfair Display', serif; font-size: clamp(42px, 7vw, 80px); font-weight: 900; line-height: 0.95; letter-spacing: -2px; margin-bottom: 20px; }
+  .header h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(42px, 7vw, 80px); font-weight: 900; line-height: 0.95; letter-spacing: -2px; margin-bottom: 20px; }
   .header h1 em { font-style: italic; font-weight: 400; color: var(--gold); }
   .header-sub { font-size: 14px; color: rgba(245,240,232,0.6); font-weight: 300; letter-spacing: 0.05em; }
   .header-meta { display: flex; gap: 32px; margin-top: 36px; padding-top: 28px; border-top: 1px solid rgba(255,255,255,0.12); flex-wrap: wrap; }
   .meta-item { display: flex; flex-direction: column; gap: 4px; }
   .meta-label { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,240,232,0.4); }
-  .meta-val { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--paper); }
+  .meta-val { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 700; color: var(--paper); }
 
   .criteria-bar { background: var(--red); padding: 14px 40px; }
   .criteria-inner { max-width: 900px; margin: 0 auto; display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
@@ -45,7 +45,7 @@
   .section { margin-top: 60px; }
   .section-header { display: flex; align-items: baseline; gap: 16px; padding-bottom: 16px; border-bottom: 2px solid var(--ink); }
   .section-day { font-size: 10px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--red); white-space: nowrap; }
-  .section-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+  .section-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
   .section-note { font-size: 12px; color: var(--muted); font-style: italic; margin-left: auto; white-space: nowrap; }
 
   .section-map { height: 180px; width: 100%; margin: 0 0 1px 0; border: 1px solid var(--border); border-top: none; overflow: hidden; position: relative; }
@@ -67,7 +67,7 @@
   .card-body::after { content: '↗'; position: absolute; top: 14px; right: 14px; font-size: 11px; color: var(--muted); opacity: 0; transition: opacity 0.15s; font-weight: 500; }
   .card-body:hover::after { opacity: 1; }
   .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 8px; padding-right: 16px; }
-  .card-name { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; line-height: 1.2; letter-spacing: -0.2px; }
+  .card-name { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 700; line-height: 1.2; letter-spacing: -0.2px; }
   .card-badges { display: flex; gap: 4px; flex-shrink: 0; align-items: flex-start; flex-wrap: wrap; justify-content: flex-end; }
   .badge { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; padding: 3px 7px; border-radius: 2px; white-space: nowrap; }
   .badge-price-1 { background: #e8f5e9; color: #2e7d32; }
@@ -103,7 +103,7 @@
   .toppick-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 12px; }
   .toppick-list { display: flex; flex-direction: column; gap: 9px; }
   .toppick-item { display: block; text-decoration: none; color: var(--paper); line-height: 1.35; }
-  .toppick-item .tp-name { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 15px; }
+  .toppick-item .tp-name { font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 15px; }
   .toppick-item .tp-name::after { content: ' ↗'; font-size: 10px; color: rgba(245,240,232,0.4); }
   .toppick-item .tp-why { display: block; font-size: 12px; color: rgba(245,240,232,0.6); font-weight: 300; }
   .toppick-item:hover .tp-name { color: var(--gold); }
@@ -114,7 +114,7 @@
   .ess-row:hover { background: var(--cream); }
   .ess-tag { flex-shrink: 0; width: 82px; font-size: 9px; font-weight: 600; letter-spacing: 0.11em; text-transform: uppercase; color: var(--gold); padding-top: 4px; }
   .ess-content { flex: 1; }
-  .ess-name { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; line-height: 1.25; }
+  .ess-name { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 700; line-height: 1.25; }
   .ess-name::after { content: ' ↗'; font-size: 10px; color: var(--muted); opacity: 0; transition: opacity 0.15s; }
   .ess-row:hover .ess-name::after { opacity: 1; }
   .ess-why { font-size: 12px; color: var(--muted); font-weight: 300; line-height: 1.45; margin-top: 3px; }
@@ -128,7 +128,7 @@
 
   .footer { background: var(--ink); color: var(--paper); padding: 40px; margin-top: 80px; }
   .footer-inner { max-width: 900px; margin: 0 auto; }
-  .footer-title { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; margin-bottom: 16px; color: var(--gold); }
+  .footer-title { font-family: 'Cormorant Garamond', serif; font-size: 14px; font-weight: 700; margin-bottom: 16px; color: var(--gold); }
   .legend { display: flex; gap: 32px; flex-wrap: wrap; }
   .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(245,240,232,0.7); }
   .footer-note { margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: rgba(245,240,232,0.35); line-height: 1.6; }
