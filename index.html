@@ -29,15 +29,15 @@
   .header-tag { font-weight: 500; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
   .header h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(42px, 7vw, 80px); font-weight: 900; line-height: 0.95; letter-spacing: -2px; margin-bottom: 20px; }
   .header h1 em { font-style: italic; font-weight: 400; color: var(--gold); }
-  .header-sub { font-size: 14px; color: rgba(245,240,232,0.6); font-weight: 300; letter-spacing: 0.05em; }
+  .header-sub { font-size: 15px; color: rgba(245,240,232,0.6); font-weight: 300; letter-spacing: 0.05em; }
   .header-meta { display: flex; gap: 32px; margin-top: 36px; padding-top: 28px; border-top: 1px solid rgba(255,255,255,0.12); flex-wrap: wrap; }
   .meta-item { display: flex; flex-direction: column; gap: 4px; }
   .meta-label { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(245,240,232,0.4); }
-  .meta-val { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 700; color: var(--paper); }
+  .meta-val { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; color: var(--paper); }
 
   .criteria-bar { background: var(--red); padding: 14px 40px; }
   .criteria-inner { max-width: 900px; margin: 0 auto; display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
-  .crit { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.92); letter-spacing: 0.04em; }
+  .crit { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.92); letter-spacing: 0.04em; }
   .crit-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.6); flex-shrink: 0; }
 
   .main { max-width: 900px; margin: 0 auto; padding: 0 40px 80px; }
@@ -45,8 +45,8 @@
   .section { margin-top: 60px; }
   .section-header { display: flex; align-items: baseline; gap: 16px; padding-bottom: 16px; border-bottom: 2px solid var(--ink); }
   .section-day { font-size: 10px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--red); white-space: nowrap; }
-  .section-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
-  .section-note { font-size: 12px; color: var(--muted); font-style: italic; margin-left: auto; white-space: nowrap; }
+  .section-title { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 700; letter-spacing: -0.5px; }
+  .section-note { font-size: 13px; color: var(--muted); font-style: italic; margin-left: auto; white-space: nowrap; }
 
   .section-map { height: 180px; width: 100%; margin: 0 0 1px 0; border: 1px solid var(--border); border-top: none; overflow: hidden; position: relative; }
   .section-map .leaflet-control-attribution { font-size: 8px !important; padding: 1px 4px !important; background: rgba(255,255,255,0.7) !important; }
@@ -56,8 +56,8 @@
   .hotel-tip::before { display: none; }
 
   .sub-label { display: flex; flex-wrap: wrap; align-items: baseline; gap: 3px 12px; margin: 36px 0 10px; padding: 11px 16px; background: var(--cream); border-left: 4px solid var(--gold); border-radius: 2px; }
-  .sub-label-main { font-size: 14px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); }
-  .sub-label-note { font-size: 11px; font-weight: 400; color: var(--muted); letter-spacing: 0.02em; }
+  .sub-label-main { font-size: 16px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); }
+  .sub-label-note { font-size: 12px; font-weight: 400; color: var(--muted); letter-spacing: 0.02em; }
 
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 1px; }
 
@@ -67,19 +67,19 @@
   .card-body::after { content: '↗'; position: absolute; top: 14px; right: 14px; font-size: 11px; color: var(--muted); opacity: 0; transition: opacity 0.15s; font-weight: 500; }
   .card-body:hover::after { opacity: 1; }
   .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 8px; padding-right: 16px; }
-  .card-name { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 700; line-height: 1.2; letter-spacing: -0.2px; }
+  .card-name { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 700; line-height: 1.2; letter-spacing: -0.2px; }
   .card-badges { display: flex; gap: 4px; flex-shrink: 0; align-items: flex-start; flex-wrap: wrap; justify-content: flex-end; }
-  .badge { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; padding: 3px 7px; border-radius: 2px; white-space: nowrap; }
+  .badge { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; padding: 3px 7px; border-radius: 2px; white-space: nowrap; }
   .badge-price-1 { background: #e8f5e9; color: #2e7d32; }
   .badge-price-2 { background: #fff3e0; color: #e65100; }
   .badge-flag { background: var(--ink); color: var(--paper); }
   .badge-healthy { background: #e3f2ed; color: #1a7a55; }
   .card-meta { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
-  .card-stars { font-size: 11px; font-weight: 500; color: var(--gold); letter-spacing: 0.02em; }
-  .card-reviews { font-size: 11px; color: var(--muted); font-weight: 300; }
-  .card-note { font-size: 12px; color: var(--muted); font-weight: 300; line-height: 1.5; border-top: 1px solid var(--border); padding-top: 10px; margin-top: 2px; }
+  .card-stars { font-size: 13px; font-weight: 500; color: var(--gold); letter-spacing: 0.02em; }
+  .card-reviews { font-size: 13px; color: var(--muted); font-weight: 300; }
+  .card-note { font-size: 15px; color: var(--muted); font-weight: 300; line-height: 1.5; border-top: 1px solid var(--border); padding-top: 10px; margin-top: 2px; }
   .card-actions { display: flex; margin-top: auto; border-top: 1px solid var(--border); }
-  .card-action { flex: 1; text-align: center; padding: 9px 8px; font-size: 11px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: background 0.15s, color 0.15s; }
+  .card-action { flex: 1; text-align: center; padding: 9px 8px; font-size: 13px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: background 0.15s, color 0.15s; }
   .card-action + .card-action { border-left: 1px solid var(--border); }
   .card-action:hover { background: var(--cream); color: var(--ink); }
 
@@ -103,9 +103,9 @@
   .toppick-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 12px; }
   .toppick-list { display: flex; flex-direction: column; gap: 9px; }
   .toppick-item { display: block; text-decoration: none; color: var(--paper); line-height: 1.35; }
-  .toppick-item .tp-name { font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 15px; }
+  .toppick-item .tp-name { font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 17px; }
   .toppick-item .tp-name::after { content: ' ↗'; font-size: 10px; color: rgba(245,240,232,0.4); }
-  .toppick-item .tp-why { display: block; font-size: 12px; color: rgba(245,240,232,0.6); font-weight: 300; }
+  .toppick-item .tp-why { display: block; font-size: 14px; color: rgba(245,240,232,0.6); font-weight: 300; }
   .toppick-item:hover .tp-name { color: var(--gold); }
 
   .essentials { background: var(--paper); border: 1px solid var(--border); border-top: none; }
@@ -114,15 +114,15 @@
   .ess-row:hover { background: var(--cream); }
   .ess-tag { flex-shrink: 0; width: 82px; font-size: 9px; font-weight: 600; letter-spacing: 0.11em; text-transform: uppercase; color: var(--gold); padding-top: 4px; }
   .ess-content { flex: 1; }
-  .ess-name { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 700; line-height: 1.25; }
+  .ess-name { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 700; line-height: 1.25; }
   .ess-name::after { content: ' ↗'; font-size: 10px; color: var(--muted); opacity: 0; transition: opacity 0.15s; }
   .ess-row:hover .ess-name::after { opacity: 1; }
-  .ess-why { font-size: 12px; color: var(--muted); font-weight: 300; line-height: 1.45; margin-top: 3px; }
+  .ess-why { font-size: 14px; color: var(--muted); font-weight: 300; line-height: 1.45; margin-top: 3px; }
 
   .intro-box { background: var(--cream); border-left: 3px solid var(--gold); border-radius: 3px; padding: 18px 22px; margin-top: 28px; }
   .intro-title { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 11px; }
   .intro-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
-  .intro-list li { font-size: 13px; color: var(--ink); line-height: 1.5; padding-left: 16px; position: relative; }
+  .intro-list li { font-size: 15px; color: var(--ink); line-height: 1.5; padding-left: 16px; position: relative; }
   .intro-list li::before { content: '›'; position: absolute; left: 2px; color: var(--gold); font-weight: 700; }
   .intro-list strong { font-weight: 500; }
 
@@ -130,7 +130,7 @@
   .footer-inner { max-width: 900px; margin: 0 auto; }
   .footer-title { font-family: 'Cormorant Garamond', serif; font-size: 14px; font-weight: 700; margin-bottom: 16px; color: var(--gold); }
   .legend { display: flex; gap: 32px; flex-wrap: wrap; }
-  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(245,240,232,0.7); }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: rgba(245,240,232,0.7); }
   .footer-note { margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: rgba(245,240,232,0.35); line-height: 1.6; }
 
   @media (max-width: 600px) {
@@ -146,7 +146,7 @@
   .filterbar.fb-hidden{transform:translateY(-110%);}
   .fb-inner{max-width:900px;margin:0 auto;padding:9px 16px;display:flex;flex-direction:column;gap:7px;}
   .fb-row{display:flex;gap:7px;align-items:center;flex-wrap:wrap;}
-  .fb-btn{font-size:12px;font-weight:600;letter-spacing:.03em;padding:6px 12px;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--ink);cursor:pointer;-webkit-tap-highlight-color:transparent;line-height:1;}
+  .fb-btn{font-size:14px;font-weight:600;letter-spacing:.03em;padding:6px 12px;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--ink);cursor:pointer;-webkit-tap-highlight-color:transparent;line-height:1;}
   .fb-btn:hover{border-color:var(--ink);}
   .fb-btn.active{background:var(--red);border-color:var(--red);color:#fff;}
   .fb-count{margin-left:auto;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
